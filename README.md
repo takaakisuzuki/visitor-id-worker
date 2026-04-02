@@ -1,31 +1,21 @@
 # visitor-id-worker
 
-A Cloudflare Worker that generates a UUID v4 and sets it as a 1st party server-side `visitor_id` cookie.
+A Cloudflare Worker that generates a UUID v4 and sets it as a 1st-party server-side `visitor_id` cookie.
 
-Cloudflare Worker を使って UUID v4 を生成し、1st Party サーバーサイド `visitor_id` Cookie を付与します。
-
----
-
-## Overview / 概要
+## Overview
 
 When a new visitor arrives without a `visitor_id` cookie, this Worker generates a UUID v4 using `crypto.randomUUID()` and attaches it via the `Set-Cookie` response header. Returning visitors are passed through with zero overhead.
 
-`visitor_id` Cookie を持たない新規訪問者にのみ、`crypto.randomUUID()` で UUID v4 を生成し `Set-Cookie` レスポンスヘッダーで付与します。既存訪問者はそのままパススルーされます。
+Unlike browser-side (JavaScript) cookies, server-side cookies issued from the edge are **not affected by ITP or other tracking prevention restrictions**.
 
-Unlike browser-side (JavaScript) cookies, server-side cookies issued from the edge are not affected by ITP or other tracking prevention restrictions.
+## Deploy
 
-ブラウザ側（JavaScript）で発行する Cookie と異なり、エッジから発行するサーバーサイド Cookie は ITP 等のトラッキング防止の制限を受けません。
-
----
-
-## Deploy / デプロイ方法
-
-### Prerequisites / 前提条件
+### Prerequisites
 
 - [Node.js](https://nodejs.org/) v18+
-- Cloudflare account with a zone (domain) / Cloudflare アカウント（ゾーン設定済み）
+- Cloudflare account with a zone (domain)
 
-### 1. Clone / クローン
+### 1. Clone
 
 ```bash
 git clone https://github.com/takaakisuzuki/visitor-id-worker.git
@@ -33,11 +23,9 @@ cd visitor-id-worker
 npm install
 ```
 
-### 2. Configure / 設定
+### 2. Configure
 
-Edit `wrangler.toml` and uncomment the routes section with your domain:
-
-`wrangler.toml` を編集し、routes セクションのコメントを外して自分のドメインを設定してください：
+Edit `wrangler.toml` and set the routes section with your domain:
 
 ```toml
 name = "visitor-id-worker"
@@ -51,40 +39,36 @@ zone_name = "example.com"
 
 Optionally, edit cookie settings in `src/index.ts`:
 
-必要に応じて `src/index.ts` の Cookie 設定を変更できます：
-
 ```typescript
-const COOKIE_NAME = "visitor_id";        // Cookie name / Cookie 名
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year / 1年
+const COOKIE_NAME = "visitor_id";           // Cookie name
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;  // 1 year
 ```
 
-### 3. Local development / ローカル開発
+### 3. Local Development
 
 ```bash
 npx wrangler dev
 ```
 
-### 4. Deploy / デプロイ
+### 4. Deploy
 
 ```bash
 npx wrangler deploy
 ```
 
-### 5. Verify / 確認
+### 5. Verify
 
-Check real-time logs / リアルタイムログの確認：
+Check real-time logs:
 
 ```bash
 npx wrangler tail
 ```
 
-Check via curl / curl で確認：
+Check via curl:
 
 ```bash
 curl -v https://example.com 2>&1 | grep -i set-cookie
 ```
-
----
 
 ## License
 
