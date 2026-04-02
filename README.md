@@ -1,12 +1,16 @@
 # visitor-id-worker
 
-A Cloudflare Worker that generates a UUID v4 and sets it as a 1st-party server-side `visitor_id` cookie.
+A Cloudflare Worker that generates a UUID v4 and sets it as a 1st-party server-side `visitor_id` cookie — designed for use as an [Adobe Experience Platform FPID (First-Party ID)](https://business.adobe.com/jp/blog/the-latest/dx-analytics-tips-itp-fpid).
+
+## Why
+
+Safari's ITP (Intelligent Tracking Prevention) caps the lifetime of client-side (JavaScript) cookies to 7 days, breaking visitor identification in Adobe Analytics / Experience Platform. The recommended solution is to issue a **First-Party ID (FPID)** via a server-side `Set-Cookie` header so the cookie is treated as a true 1st-party cookie and is **exempt from ITP restrictions**.
+
+This Worker runs on Cloudflare's edge, generates a UUID v4 per new visitor, and sets it as a server-side cookie — ready to be used as an FPID with the Adobe Experience Platform Web SDK.
 
 ## Overview
 
 When a new visitor arrives without a `visitor_id` cookie, this Worker generates a UUID v4 using `crypto.randomUUID()` and attaches it via the `Set-Cookie` response header. Returning visitors are passed through with zero overhead.
-
-Unlike browser-side (JavaScript) cookies, server-side cookies issued from the edge are **not affected by ITP or other tracking prevention restrictions**.
 
 ## Deploy
 
